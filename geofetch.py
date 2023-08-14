@@ -2,6 +2,7 @@
 
 import argparse
 import ctypes
+import datetime
 import os
 import socket
 import psutil
@@ -172,6 +173,26 @@ parser.add_argument(
 	action='store_true',
 	help="Don't show info about mounted partitions, overrides --show-partitions"
 )
+parser.add_argument(
+	'--show-nic-info',
+	action='store_true',
+	help="Show info about all Network Interface Cards (hidden by default"
+)
+parser.add_argument(
+	'--hide-nic-info',
+	action='store_true',
+	help="Don't show info about all Network Interface Cards, overrides --show-nic-info"
+)
+parser.add_argument(
+	'--show-uptime',
+	action='store_true',
+	help="Show uptime of the system (hidden by default)"
+)
+parser.add_argument(
+	'--hide-uptime',
+	action='store_true',
+	help="Don't show uptime of the system, overrides --show-uptime"
+)
 
 # Parse the arguments
 args = parser.parse_args()
@@ -184,6 +205,8 @@ cpu = True
 showOS = True
 deviceInfo = True
 showPartitions = False
+showNICInfo = False
+uptime = False
 
 if args.show_hostname:
 	hostname = True
@@ -213,6 +236,14 @@ if args.show_partitions:
 	showPartitions = True
 if args.hide_partitions:
 	showPartitions = False
+if args.show_nic_info:
+	showNICInfo = True
+if args.hide_nic_info:
+	showNICInfo = False
+if args.show_uptime:
+	uptime = True
+if args.hide_uptime:
+	uptime = False
 
 # username@hostname
 
@@ -332,7 +363,7 @@ if showOS:
 
 # Device
 if deviceInfo:
-	print(f"{bcolors.WARNING}Host: {bcolors.FAIL}{get_device()}{bcolors.ENDC}")
+	print(f"{bcolors.WARNING}Host: {bcolors.FAIL}{get_device()} ({platform.machine()}){bcolors.ENDC}")
 
 # Disk usage of the root
 if showPartitions:
@@ -351,3 +382,15 @@ if showPartitions:
 	# storageUnitName = pickStorageUnit(usage.total)
 	# storageUnit = storageUnits[storageUnitName]
 
+# NIC info
+if showNICInfo:
+	NICs = psutil.net_if_stats()
+	for NIC in NICs.keys():
+		NIC_info = NICs[NIC]
+		print(f"{bcolors.WARNING}Interface {NIC}: {bcolors.FAIL}flags={bcolors.HEADER}'{NIC_info.flags}'{bcolors.FAIL} speed={NIC_info.speed or '?'} MB mtu={NIC_info.mtu} state={bcolors.OKGREEN + 'UP' + bcolors.FAIL if NIC_info.isup else 'DOWN'}{bcolors.ENDC}")
+
+# Uptime
+if uptime:
+	uptimeUnix = psutil.boot_time()
+	uptimeDatetime = datetime.datetime.now() - datetime.datetime.fromtimestamp(uptimeUnix)
+	print(f"{bcolors.WARNING}Uptime: {bcolors.FAIL}{uptimeDatetime.days} day(s){bcolors.ENDC}")
