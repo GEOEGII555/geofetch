@@ -13,11 +13,19 @@ on:
 
 name: Build and create Release
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
+      - name: Build .deb file
+        id: build_deb
+        run: |
+          bash make_deb.sh
+          mv deb.deb geofetch.deb
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -31,3 +39,5 @@ jobs:
             ${{ github.event.inputs.message }}
           draft: false
           prerelease: ${{ github.event.inputs.prerelease }}
+          artifacts: |
+            geofetch.deb
