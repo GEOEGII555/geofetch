@@ -1,0 +1,33 @@
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        required: true
+        description: The tag name
+      prerelease:
+        type: boolean
+        description: Pre-release
+      message:
+        required: true
+        description: Release message
+
+name: Build and create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.event.inputs.tag_name }}
+          release_name: Release ${{ github.event.inputs.tag_name }}
+          body: |
+            Download the source .zip file and check README.md for instructions on how to install.
+            ${{ github.event.inputs.message }}
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease }}
