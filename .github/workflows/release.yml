@@ -14,9 +14,7 @@ on:
 name: Build and create Release
 
 permissions:
-  contents: |
-    read
-    write
+  contents: write
 
 jobs:
   build:
