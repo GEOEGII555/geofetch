@@ -71,14 +71,14 @@ def get_cpu_info():
 
 def get_advertised_cpu_speed():
 	if os.name == 'nt':
-		# Windows Method 1
+		# Windows method 1
 		libc = ctypes.windll.kernel32
 		freq = ctypes.c_uint64(0)
 		ret = libc.QueryPerformanceFrequency(ctypes.byref(freq))
 		if ret:
 			return f"{freq.value / 1000000:.2f} MHz"
 		return "Unknown"
-	# Linux Method 1
+	# Linux method 1
 	try:
 		with open('/proc/cpuinfo', 'r') as f:
 			for line in f:
@@ -86,13 +86,13 @@ def get_advertised_cpu_speed():
 					return f"{float(line.split(':')[1].strip()):.2f} MHz"
 	except FileNotFoundError:
 		pass
-	# Linux Method 2
+	# Linux method 2
 	try:
 		with open('/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq', 'r') as f:
 			return f"{int(f.read()) / 1000:.2f} MHz"
 	except FileNotFoundError:
 		pass
-	# Darwin Method 1
+	# Darwin method 1
 	libc = ctypes.CDLL(None)
 	buf = ctypes.create_string_buffer(128)
 	ret = libc.sysctlbyname(b'hw.cpufrequency_max', buf, ctypes.byref(ctypes.c_size_t(128)), None, 0)
@@ -265,15 +265,18 @@ def get_android_version():
 
 def get_device():
 	if is_running_on_android():
+		# Android method 1
 		output = subprocess.check_output(['getprop', 'ro.product.manufacturer'], stderr=subprocess.DEVNULL)
 		output2 = subprocess.check_output(['getprop', 'ro.product.model'], stderr=subprocess.DEVNULL)
 		return output.strip().decode('utf-8', errors='ignore') + " " + output2.strip().decode('utf-8', errors='ignore')
 	if os.name == "nt":
+		# Windows method 1
 		c = wmi.WMI()
 		my_system = c.Win32_ComputerSystem()[0]
 		return my_system.Manufacturer + " " + my_system.Model
 	if os.name == "posix":
 		if os.uname().sysname.lower() == "darwin":
+			# Darwin method 1
 			try:
 				output = subprocess.check_output(["system_profiler", "SPHardwareDataType"], universal_newlines=True)
 				manufacturer_line = [line for line in output.splitlines() if "Manufacturer" in line][0]
@@ -282,14 +285,26 @@ def get_device():
 			except subprocess.CalledProcessError:
 				pass
 		else:
-			try:
-				output = subprocess.check_output(["dmidecode", "-s", "system-manufacturer"], universal_newlines=True)
-				manufacturer = output.strip()
-				output = subprocess.check_output(["dmidecode", "-s", "system-product-name"], universal_newlines=True)
-				model = output.strip()
-				return f"Manufacturer: {manufacturer} Model: {model}"
-			except subprocess.CalledProcessError:
-				pass
+			# Linux method 1
+			if os.path.exists("/sys/devices/virtual/dmi/id/product_name") or os.path.exists("/sys/devices/virtual/dmi/id/product_version"):
+				ret = ""
+				if os.path.exists("/sys/devices/virtual/dmi/id/product_name"):
+					with open("/sys/devices/virtual/dmi/id/product_name", "r") as f:
+						ret = f.read().strip().strip("\n")
+				if os.path.exists("/sys/devices/virtual/dmi/id/product_version"):
+					if ret:
+						ret += " "
+					with open("/sys/devices/virtual/dmi/id/product_version", "r") as f:
+						ret += f.read().strip()
+				return ret
+			# Linux method 2
+			if os.path.exists("/sys/firmware/devicetree/base/model"):
+				with open("/sys/firmware/devicetree/base/model", "r") as f:
+					return f.read().strip()
+			# Linux method 3
+			if os.path.exists("/tmp/sysinfo/model"):
+				with open("/tmp/sysinfo/model", "r") as f:
+					return f.read().strip()
 	return "Unknown"
 
 if showOS:

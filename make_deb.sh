@@ -17,7 +17,7 @@ Description: geofetch lets you get some info about your system, just like neofet
 $(cat debian_req)
 EOF
 cp -v geofetch deb/usr/bin
-cp -v geofetch.py deb/usr/bin/geofetch
+cp -v geofetch.py deb/usr/bin/geofetch.d
 chmod -R -v 0755 deb/DEBIAN
 dpkg-deb --build deb
 rm -rf deb
