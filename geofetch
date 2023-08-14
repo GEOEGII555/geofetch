@@ -1,3 +1,9 @@
-#!/bin/sh
+#! /bin/bash
 
-python3 $(dirname "$0")/geofetch.py
+# Run geofetch.py
+if test -f "$(dirname '$0')/geofetch.py";
+then
+	python3 $(dirname '$0')/geofetch.py "$@"
+else
+	python3 $(dirname "$0")/geofetch/geofetch.py "$@"
+fi

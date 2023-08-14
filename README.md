@@ -20,7 +20,11 @@ Depends: ...,
 
 2. Install the package
 
-`$ sudo cp geofetch geofetch.py /usr/local/bin`
+`$ sudo cp geofetch /usr/local/bin`
+
+`$ sudo mkdir /usr/local/bin/geofetch`
+
+`$ sudo cp geofetch.py /usr/local/bin/geofetch`
 
 3. Done!
 

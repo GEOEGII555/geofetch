@@ -16,9 +16,9 @@ apt -o Dir=$prefix update
 apt -o Dir=$prefix install python3 python3-pip
 umask 022
 # python3 -m pip install
-mkdir -v -p ${prefix}usr/local/bin
+mkdir -v -p ${prefix}usr/local/bin/geofetch
 cp -v geofetch ${prefix}usr/local/bin
-cp -v geofetch.py ${prefix}usr/local/bin
+cp -v geofetch.py ${prefix}usr/local/bin/geofetch
 chmod +x ${prefix}usr/local/bin/geofetch
 chmod +x ${prefix}usr/local/bin/geofetch.py
 echo Done\!
