@@ -28,3 +28,10 @@ Depends: ...,
 
 3. Done!
 
+## Windows
+
+1. Install Python 3.10 with pip
+
+2. `X:\geofetch> python3 -m pip install -r requirements_win.txt`
+
+3. Run geofetch: `X:\geofetch> python3 geofetch.py`
