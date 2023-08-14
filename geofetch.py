@@ -162,6 +162,16 @@ parser.add_argument(
 	action='store_true',
 	help="Don't show your device manufacturer and model, overrides --show-device-info"
 )
+parser.add_argument(
+	'--show-partitions',
+	action='store_true',
+	help="Show info about mounted partitions (hidden by default)"
+)
+parser.add_argument(
+	'--hide-partitions',
+	action='store_true',
+	help="Don't show info about mounted partitions, overrides --show-partitions"
+)
 
 # Parse the arguments
 args = parser.parse_args()
@@ -173,6 +183,7 @@ memory_usage = True
 cpu = True
 showOS = True
 deviceInfo = True
+showPartitions = False
 
 if args.show_hostname:
 	hostname = True
@@ -198,6 +209,10 @@ if args.show_device_info:
 	deviceInfo = True
 if args.hide_device_info:
 	deviceInfo = False
+if args.show_partitions:
+	showPartitions = True
+if args.hide_partitions:
+	showPartitions = False
 
 # username@hostname
 
@@ -317,4 +332,22 @@ if showOS:
 
 # Device
 if deviceInfo:
-	print(f"{bcolors.WARNING}Device: {bcolors.FAIL}{get_device()}{bcolors.ENDC}")
+	print(f"{bcolors.WARNING}Host: {bcolors.FAIL}{get_device()}{bcolors.ENDC}")
+
+# Disk usage of the root
+if showPartitions:
+	partitions = psutil.disk_partitions(all=True)
+	for partition in partitions:
+		usageStr = ""
+		try:
+			if partition.mountpoint:
+				usage = psutil.disk_usage(partition.mountpoint)
+				storageUnitName = pickStorageUnit(usage.total)
+				storageUnit = storageUnits[storageUnitName]
+				usageStr += f" partition_usage={round(usage.used / storageUnit, 2)}/{round(usage.total / storageUnit, 2)} {storageUnitName} ({usage.percent}%)"
+		except:
+			usageStr = ""
+		print(f"{bcolors.WARNING}Partition {partition.device} (mounted at {partition.mountpoint}): {bcolors.FAIL}filesystem={partition.fstype} opts={bcolors.HEADER}'{partition.opts}'{bcolors.FAIL}{usageStr}{bcolors.ENDC}")
+	# storageUnitName = pickStorageUnit(usage.total)
+	# storageUnit = storageUnits[storageUnitName]
+
