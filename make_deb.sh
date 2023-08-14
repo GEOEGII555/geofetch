@@ -6,7 +6,7 @@ then
 	exit
 fi
 rm -rf deb
-mkdir -v -p deb/usr/bin/geofetch deb/DEBIAN
+mkdir -v -p deb/usr/bin/geofetch.d deb/DEBIAN
 VERSION=$(cat VERSION | head -n 1 -q | tr -d '\n')
 tee deb/DEBIAN/control >/dev/null <<EOF
 Package: geofetch
