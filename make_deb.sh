@@ -13,7 +13,7 @@ Package: geofetch
 Version: $VERSION
 Maintainer: GEOEGII555
 Architecture: all
-Description: geofetch lets you get some info about your system, just like neofetch. Usually it outputs only general information, but you can get more! Get started: geofetch --help
+Description: geofetch lets you get some info about your system, just like neofetch. Usually it outputs only general information, but you can optionally display more info.
 $(cat debian_req)
 EOF
 cp -v geofetch deb/usr/bin

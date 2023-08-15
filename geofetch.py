@@ -45,7 +45,7 @@ def pickStorageUnit(bytes: int) -> str:
 # Argument parser
 parser = argparse.ArgumentParser(
 	prog='geofetch',
-	description='geofetch lets you get some info about your system, just like neofetch. Usually it outputs only general information, but you can get more! Get started: geofetch --help',
+	description='geofetch lets you get some info about your system, just like neofetch. Usually it outputs only general information, but you can optionally display more info.',
 	epilog='The hide option has more priority than the show option'
 )
 
