@@ -8,6 +8,7 @@ import psutil
 import platform
 import subprocess
 import re
+import requests
 
 if os.name.lower() == "posix":
 	import distro
@@ -172,6 +173,16 @@ parser.add_argument(
 	action='store_true',
 	help="Don't show info about mounted partitions, overrides --show-partitions"
 )
+parser.add_argument(
+	'--show-ip',
+	action='store_true',
+	help="Show your public IP (hidden by default)"
+)
+parser.add_argument(
+	'--hide-ip',
+	action='store_true',
+	help="Don't show your public IP, overrides --show-ip"
+)
 
 # Parse the arguments
 args = parser.parse_args()
@@ -184,6 +195,7 @@ cpu = True
 showOS = True
 deviceInfo = True
 showPartitions = False
+showIP = False
 
 if args.show_hostname:
 	hostname = True
@@ -213,6 +225,10 @@ if args.show_partitions:
 	showPartitions = True
 if args.hide_partitions:
 	showPartitions = False
+if args.show_ip:
+	showIP = True
+if args.hide_ip:
+	showIP = False
 
 # username@hostname
 
@@ -350,4 +366,12 @@ if showPartitions:
 		print(f"{bcolors.WARNING}Partition {partition.device} (mounted at {partition.mountpoint}): {bcolors.FAIL}filesystem={partition.fstype} opts={bcolors.HEADER}'{partition.opts}'{bcolors.FAIL}{usageStr}{bcolors.ENDC}")
 	# storageUnitName = pickStorageUnit(usage.total)
 	# storageUnit = storageUnits[storageUnitName]
+
+# IP
+if showIP:
+	try:
+		resp = requests.get("https://icanhazip.com")
+		print(f"{bcolors.WARNING}Public IP: {bcolors.FAIL}{resp.text}{bcolors.ENDC}")
+	except:
+		print(f"{bcolors.WARNING}Public IP: {bcolors.FAIL}Error!{bcolors.ENDC}")
 

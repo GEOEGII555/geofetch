@@ -3,4 +3,6 @@ Depends: python3,
   python-argparse,
   python3-psutil,
   python3-distro,
-  python3-distro-info
+  python3-distro-info,
+  python3-requests
+
